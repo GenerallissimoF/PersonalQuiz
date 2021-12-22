@@ -23,47 +23,35 @@ class ResultsViewController: UIViewController {
         super.viewDidLoad()
         self.navigationItem.hidesBackButton = true
         //подумал, что если присутствует картинка, то нужно метод получения этой картинки поместить сюда
-        findAnimal ()
+        if let animalType = findAnimalType() {
+                   updateSubviews(with: animalType)
+               }
+
     }
     
-    
-   // знаю что можно было реализовать через добавление в пустой словарь экземпляров со свойствами, которые еще не содержаться в словаре, а также реализовать значение словаря как счетчик, тогда можно было бы легко масштабировать код если например число видов и экземпляров животных увеличится, но у миня не хватило скиллов
-    private func findAnimal () {
-        guard let arrayOfAnswers = answers else { return }
-        // print(arrayOfAnswers)
-        var catCount = 0
-        var dogCount = 0
-        var turtleCount = 0
-        var rabbitCount = 0
-        var animalPack = [PersonalQuiz.AnimalType: Int]()
-        for animal in arrayOfAnswers {
+    // Не нашел я подходящий алгоритм, сделал так
+    private func findAnimalType() -> AnimalType? {
+            guard let answers = answers else { return nil }
+            var animalPack = [AnimalType: Int]()
             
-            
-            if animal.type == PersonalQuiz.AnimalType.cat {
-                catCount += 1
-                animalPack.updateValue(catCount, forKey: animal.type)
-                
-            } else if animal.type == PersonalQuiz.AnimalType.dog {
-                dogCount += 1
-                animalPack.updateValue(dogCount, forKey: animal.type)
-                
-            } else if animal.type == PersonalQuiz.AnimalType.turtle {
-                turtleCount += 1
-                animalPack.updateValue(turtleCount, forKey: animal.type)
-                
-            } else if animal.type == PersonalQuiz.AnimalType.rabbit {
-                rabbitCount += 1
-                animalPack.updateValue(rabbitCount, forKey: animal.type)
+            for answer in answers {
+                if let counter = animalPack[answer.type] {
+                    animalPack[answer.type] = counter + 1
+                } else {
+                    animalPack[answer.type] = 1
+                }
             }
-            
-            
+            let sortedAnimals = animalPack.sorted { $0.1 > $1.1 }
+            return sortedAnimals.first?.key
         }
-        let sortedAnimals = animalPack.sorted { $0.1 > $1.1 }
-        guard let mainAnimal = sortedAnimals.first?.key else {return}
-        animalLabel.text = " Вы - \(mainAnimal.rawValue)"
-        animalDiscriptionLabel.text = mainAnimal.definition
-        
+
+    private func updateSubviews(with type: AnimalType) {
+            animalLabel.text = " Вы - \(type.rawValue)"
+            animalDiscriptionLabel.text = type.definition
+        }
     }
+        
+
     
     
     
@@ -72,5 +60,5 @@ class ResultsViewController: UIViewController {
     
     
     
-}
+
 
